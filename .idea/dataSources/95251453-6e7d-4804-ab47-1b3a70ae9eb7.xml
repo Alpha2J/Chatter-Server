@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource name="MySQL - chatter@localhost">
+  <database-model serializer="dbm" rdbms="MYSQL" format-version="2.6">
+    <schema id="1" name="chatter">
+      <visible>1</visible>
+    </schema>
+    <schema id="2" name="alpha"/>
+    <schema id="3" name="dormitory"/>
+    <schema id="4" name="head_first_sql_test"/>
+    <schema id="5" name="hibernate"/>
+    <schema id="6" name="hibernatetest"/>
+    <schema id="7" name="information_schema"/>
+    <schema id="8" name="jbbs"/>
+    <schema id="9" name="jeeshop"/>
+    <schema id="10" name="jpress"/>
+    <schema id="11" name="mybbs"/>
+    <schema id="12" name="mysql"/>
+    <schema id="13" name="performance_schema"/>
+    <schema id="14" name="qq"/>
+    <schema id="15" name="shop"/>
+    <schema id="16" name="sys"/>
+    <schema id="17" name="testdate"/>
+    <schema id="18" name="yybbs"/>
+    <schema id="19" name="markettest"/>
+    <table id="20" parent="1" name="chatter"/>
+    <table id="21" parent="1" name="chatterprivate"/>
+    <table id="22" parent="1" name="contactgrouptype"/>
+    <table id="23" parent="1" name="contactmapping"/>
+    <table id="24" parent="1" name="chattergroup"/>
+    <table id="25" parent="1" name="chattergroupmapping"/>
+    <table id="26" parent="1" name="message"/>
+    <table id="27" parent="1" name="chatternotifiermapping"/>
+    <column id="28" parent="20" name="id">
+      <mandatory>1</mandatory>
+      <data-type>int(11)|0</data-type>
+      <sequence-identity>1</sequence-identity>
+    </column>
+    <column id="29" parent="20" name="account">
+      <comment>登录账号</comment>
+      <mandatory>1</mandatory>
+      <data-type>varchar(20)|0</data-type>
+    </column>
+    <column id="30" parent="20" name="headImage">
+      <mandatory>1</mandatory>
+      <data-type>varchar(60)|0</data-type>
+      <default-expression>&apos;D:\chatter\image&apos;</default-expression>
+    </column>
+    <column id="31" parent="20" name="nickname">
+      <mandatory>1</mandatory>
+      <data-type>varchar(30)|0</data-type>
+      <default-expression>&apos;chatter&apos;</default-expression>
+    </column>
+    <column id="32" parent="20" name="signature">
+      <data-type>varchar(255)|0</data-type>
+    </column>
+    <column id="33" parent="20" name="gender">
+      <mandatory>1</mandatory>
+      <data-type>varchar(20)|0</data-type>
+      <default-expression>&apos;未知性别&apos;</default-expression>
+    </column>
+    <column id="34" parent="20" name="region">
+      <mandatory>1</mandatory>
+      <data-type>varchar(50)|0</data-type>
+      <default-expression>&apos;未知地区&apos;</default-expression>
+    </column>
+    <column id="35" parent="20" name="createTime">
+      <mandatory>1</mandatory>
+      <data-type>datetime|0</data-type>
+      <default-expression>CURRENT_TIMESTAMP</default-expression>
+    </column>
+    <column id="36" parent="20" name="phone">
+      <comment>电话号码</comment>
+      <data-type>varchar(20)|0</data-type>
+    </column>
+    <key id="37" parent="20" name="PRIMARY">
+      <columns>id</columns>
+      <primary>1</primary>
+    </key>
+    <column id="38" parent="21" name="id">
+      <mandatory>1</mandatory>
+      <data-type>int(11)|0</data-type>
+      <sequence-identity>1</sequence-identity>
+    </column>
+    <column id="39" parent="21" name="chatterId">
+      <mandatory>1</mandatory>
+      <data-type>int(11)|0</data-type>
+    </column>
+    <column id="40" parent="21" name="password">
+      <comment>密码</comment>
+      <mandatory>1</mandatory>
+      <data-type>varchar(60)|0</data-type>
+    </column>
+    <column id="41" parent="21" name="state">
+      <comment>账号的状态, 0 为正常, 1为停用</comment>
+      <data-type>tinyint(4)|0</data-type>
+      <default-expression>&apos;0&apos;</default-expression>
+    </column>
+    <key id="42" parent="21" name="PRIMARY">
+      <columns>id</columns>
+      <primary>1</primary>
+    </key>
+    <column id="43" parent="22" name="id">
+      <mandatory>1</mandatory>
+      <data-type>int(11)|0</data-type>
+      <sequence-identity>1</sequence-identity>
+    </column>
+    <column id="44" parent="22" name="chatterId">
+      <comment>chatterId 没有-1的, -1的话要么是测试数据, 要么是id为0的默认值</comment>
+      <mandatory>1</mandatory>
+      <data-type>int(11)|0</data-type>
+      <default-expression>&apos;-1&apos;</default-expression>
+    </column>
+    <column id="45" parent="22" name="typeName">
+      <mandatory>1</mandatory>
+      <data-type>varchar(30)|0</data-type>
+      <default-expression>&apos;默认分组&apos;</default-expression>
+    </column>
+    <key id="46" parent="22" name="PRIMARY">
+      <columns>id</columns>
+      <primary>1</primary>
+    </key>
+    <column id="47" parent="23" name="id">
+      <mandatory>1</mandatory>
+      <data-type>int(11)|0</data-type>
+      <sequence-identity>1</sequence-identity>
+    </column>
+    <column id="48" parent="23" name="chatterId">
+      <mandatory>1</mandatory>
+      <data-type>int(11)|0</data-type>
+    </column>
+    <column id="49" parent="23" name="contactId">
+      <mandatory>1</mandatory>
+      <data-type>int(11)|0</data-type>
+    </column>
+    <column id="50" parent="23" name="contactGroupTypeId">
+      <comment>0表示默认分组</comment>
+      <mandatory>1</mandatory>
+      <data-type>int(11)|0</data-type>
+      <default-expression>&apos;0&apos;</default-expression>
+    </column>
+    <column id="51" parent="23" name="remark">
+      <data-type>varchar(20)|0</data-type>
+    </column>
+    <key id="52" parent="23" name="PRIMARY">
+      <columns>id</columns>
+      <primary>1</primary>
+    </key>
+    <column id="53" parent="24" name="id">
+      <mandatory>1</mandatory>
+      <data-type>int(11)|0</data-type>
+      <sequence-identity>1</sequence-identity>
+    </column>
+    <column id="54" parent="24" name="account">
+      <mandatory>1</mandatory>
+      <data-type>varchar(20)|0</data-type>
+    </column>
+    <column id="55" parent="24" name="headImage">
+      <mandatory>1</mandatory>
+      <data-type>varchar(60)|0</data-type>
+      <default-expression>&apos;D:\chatter\image&apos;</default-expression>
+    </column>
+    <column id="56" parent="24" name="groupName">
+      <mandatory>1</mandatory>
+      <data-type>varchar(30)|0</data-type>
+      <default-expression>&apos;未命名群组&apos;</default-expression>
+    </column>
+    <column id="57" parent="24" name="notice">
+      <data-type>varchar(255)|0</data-type>
+    </column>
+    <column id="58" parent="24" name="createTime">
+      <mandatory>1</mandatory>
+      <data-type>datetime|0</data-type>
+      <default-expression>CURRENT_TIMESTAMP</default-expression>
+    </column>
+    <column id="59" parent="24" name="state">
+      <comment>0表示正常使用, 1表示群被封掉了</comment>
+      <data-type>tinyint(4)|0</data-type>
+      <default-expression>&apos;0&apos;</default-expression>
+    </column>
+    <column id="60" parent="24" name="groupOwnerId">
+      <comment>群主的id</comment>
+      <mandatory>1</mandatory>
+      <data-type>int(11)|0</data-type>
+    </column>
+    <key id="61" parent="24" name="PRIMARY">
+      <columns>id</columns>
+      <primary>1</primary>
+    </key>
+    <column id="62" parent="25" name="id">
+      <mandatory>1</mandatory>
+      <data-type>int(11)|0</data-type>
+      <sequence-identity>1</sequence-identity>
+    </column>
+    <column id="63" parent="25" name="chatterGroupId">
+      <mandatory>1</mandatory>
+      <data-type>int(11)|0</data-type>
+    </column>
+    <column id="64" parent="25" name="chatterId">
+      <mandatory>1</mandatory>
+      <data-type>int(11)|0</data-type>
+    </column>
+    <key id="65" parent="25" name="PRIMARY">
+      <columns>id</columns>
+      <primary>1</primary>
+    </key>
+    <column id="66" parent="26" name="id">
+      <mandatory>1</mandatory>
+      <data-type>int(11)|0</data-type>
+      <sequence-identity>1</sequence-identity>
+    </column>
+    <column id="67" parent="26" name="uuid">
+      <mandatory>1</mandatory>
+      <data-type>varchar(50)|0</data-type>
+    </column>
+    <column id="68" parent="26" name="messageType">
+      <comment>消息类型, 比如群聊消息还是私聊消息</comment>
+      <mandatory>1</mandatory>
+      <data-type>smallint(6)|0</data-type>
+    </column>
+    <column id="69" parent="26" name="contentType">
+      <comment>内容类型, 比如是文本消息, 图片消息, 语音消息还是文件</comment>
+      <mandatory>1</mandatory>
+      <data-type>smallint(6)|0</data-type>
+    </column>
+    <column id="70" parent="26" name="sendTime">
+      <comment>消息发送时候的时间戳</comment>
+      <mandatory>1</mandatory>
+      <data-type>datetime|0</data-type>
+    </column>
+    <column id="71" parent="26" name="sendId">
+      <mandatory>1</mandatory>
+      <data-type>int(11)|0</data-type>
+    </column>
+    <column id="72" parent="26" name="receiveId">
+      <mandatory>1</mandatory>
+      <data-type>int(11)|0</data-type>
+    </column>
+    <column id="73" parent="26" name="content">
+      <comment>消息的内容, 若是文本直接存数据, 图片,文件等存路径</comment>
+      <data-type>varchar(255)|0</data-type>
+    </column>
+    <key id="74" parent="26" name="PRIMARY">
+      <columns>id</columns>
+      <primary>1</primary>
+    </key>
+    <column id="75" parent="27" name="id">
+      <mandatory>1</mandatory>
+      <data-type>int(11)|0</data-type>
+      <sequence-identity>1</sequence-identity>
+    </column>
+    <column id="76" parent="27" name="chatterId">
+      <mandatory>1</mandatory>
+      <data-type>int(11)|0</data-type>
+    </column>
+    <column id="77" parent="27" name="lastAccessMessageId">
+      <comment>最后一次读取的消息id</comment>
+      <mandatory>1</mandatory>
+      <data-type>int(11)|0</data-type>
+      <default-expression>&apos;-1&apos;</default-expression>
+    </column>
+    <column id="78" parent="27" name="lastNewMessageId">
+      <comment>上次存入的消息id</comment>
+      <mandatory>1</mandatory>
+      <data-type>int(11)|0</data-type>
+      <default-expression>&apos;-1&apos;</default-expression>
+    </column>
+    <index id="79" parent="27" name="chatterId">
+      <columns>chatterId</columns>
+      <desc-columns></desc-columns>
+      <unique>1</unique>
+    </index>
+    <key id="80" parent="27" name="PRIMARY">
+      <columns>id</columns>
+      <primary>1</primary>
+    </key>
+    <key id="81" parent="27" name="chatterId">
+      <columns>chatterId</columns>
+      <underlying-index>chatterId</underlying-index>
+    </key>
+  </database-model>
+</dataSource>
