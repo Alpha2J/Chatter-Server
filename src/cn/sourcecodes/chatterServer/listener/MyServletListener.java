@@ -1,11 +1,8 @@
 package cn.sourcecodes.chatterServer.listener;
 
 import cn.sourcecodes.chatterServer.entity.Chatter;
-import cn.sourcecodes.chatterServer.service.MessageNotifierService;
-import cn.sourcecodes.chatterServer.service.impl.MessageNotifierServiceImpl;
 import cn.sourcecodes.chatterServer.servlet.message.entity.MessageNotifier;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.http.*;
@@ -19,7 +16,7 @@ public class MyServletListener implements ServletContextListener,
         HttpSessionListener, HttpSessionAttributeListener {
 
     //用来保存chatterId 和 已登录用户的MessageNotifier 的映射map
-    private Map<Integer, MessageNotifier> chatterNotifierMap;
+    private Map<java.lang.Integer, MessageNotifier> chatterNotifierMap;
     private MessageNotifierService messageNotifierService;
 
     // Public constructor is required by servlet spec

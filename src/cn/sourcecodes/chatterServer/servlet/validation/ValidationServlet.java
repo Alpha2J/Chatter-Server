@@ -2,9 +2,7 @@ package cn.sourcecodes.chatterServer.servlet.validation;
 
 import cn.sourcecodes.chatterServer.entity.Chatter;
 import cn.sourcecodes.chatterServer.service.ChatterService;
-import cn.sourcecodes.chatterServer.service.MessageNotifierService;
 import cn.sourcecodes.chatterServer.service.impl.ChatterServiceImpl;
-import cn.sourcecodes.chatterServer.service.impl.MessageNotifierServiceImpl;
 import cn.sourcecodes.chatterServer.servlet.message.entity.MessageNotifier;
 import cn.sourcecodes.chatterServer.servlet.validation.constant.ValidationConstant;
 import cn.sourcecodes.chatterServer.servlet.entity.ServerResponse;
@@ -23,7 +21,7 @@ import java.util.Map;
  */
 public class ValidationServlet extends javax.servlet.http.HttpServlet {
 
-    private ChatterService userService = new ChatterServiceImpl();
+    private ChatterService chatterService = ChatterServiceImpl.getInstance();
     private MessageNotifierService messageNotifierService = new MessageNotifierServiceImpl();
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -73,10 +71,10 @@ public class ValidationServlet extends javax.servlet.http.HttpServlet {
             return;
         }
 
-        Chatter chatter = userService.loginByAccount(account, password);
+        Chatter chatter = chatterService.loginByAccount(account, password);
         if(chatter != null) {//chatter不为null说明验证通过
             //一个用户只能在一个地方登录
-            if(((Map<Integer, MessageNotifier>) getServletContext().getAttribute("chatterNotifierMap")).get(chatter.getId()) != null) {
+            if(((Map<java.lang.Integer, MessageNotifier>) getServletContext().getAttribute("chatterNotifierMap")).get(chatter.getId()) != null) {
                 resultJson = generateResultJson(ValidationConstant.VALIDATION__LOGIN_AREA_LIMIT, "当前账号已登录或上次没有正确退出, 请10分钟后重试!");
                 response.getWriter().println(resultJson);
                 return;
@@ -86,7 +84,7 @@ public class ValidationServlet extends javax.servlet.http.HttpServlet {
             request.getSession().setAttribute("chatter", chatter);//存入session
             MessageNotifier messageNotifier = messageNotifierService.getLastMessageAccessData(chatter.getId());
             //初始化消息同步需要的类
-            ((Map<Integer, MessageNotifier>) getServletContext().getAttribute("chatterNotifierMap")).put(chatter.getId(), messageNotifier);
+            ((Map<java.lang.Integer, MessageNotifier>) getServletContext().getAttribute("chatterNotifierMap")).put(chatter.getId(), messageNotifier);
 
             resultJson = generateResultJson(ValidationConstant.VALIDATION__LOGIN_SUCCESS, "登录成功!");
             response.getWriter().println(resultJson);

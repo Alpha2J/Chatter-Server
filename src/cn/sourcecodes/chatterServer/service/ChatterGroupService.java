@@ -10,11 +10,27 @@ import java.util.List;
 public interface ChatterGroupService {
 
     /**
-     * 增加群组
+     * 创建群组
      * @param chatterGroup
      * @return
      */
-    boolean addChatterGroup(ChatterGroup chatterGroup);
+    boolean createChatterGroup(ChatterGroup chatterGroup);
+
+    /**
+     * 增加群成员
+     * @param groupId
+     * @param memberId
+     * @return
+     */
+    boolean addGroupMember(int groupId, int memberId);
+
+    /**
+     * 增加一组成员
+     * @param groupId
+     * @param memberIds
+     * @return
+     */
+    boolean addGroupMembers(int groupId, List<Integer> memberIds);
 
     /**
      * 删除群组
@@ -24,6 +40,22 @@ public interface ChatterGroupService {
     boolean deleteChatterGroup(ChatterGroup chatterGroup);
 
     /**
+     * 删除群成员(t人)
+     * @param groupId
+     * @param memberId
+     * @return
+     */
+    boolean deleteGroupMember(int groupId, int memberId);
+
+    /**
+     * t一组成员
+     * @param groupId
+     * @param memberIds
+     * @return
+     */
+    boolean deleteGroupMembers(int groupId, List<Integer> memberIds);
+
+    /**
      * 获取某个群基本信息, 不包括群成员
      * @param chatterGroupId
      * @return
@@ -31,7 +63,7 @@ public interface ChatterGroupService {
     ChatterGroup getBasicChatterGroup(int chatterGroupId);
 
     /**
-     * 获取群信息, 包括群成员(群成员其实只包含id信息)
+     * 获取群信息, 包括群成员
      * @param chatterGroupId
      * @return
      */
@@ -40,34 +72,34 @@ public interface ChatterGroupService {
     /**
      * 更改群头像
      * @param chatterGroup 需要更改的群
-     * @param executeChatterId 谁执行更改
+     * @param headImage 新的群头像
      * @return
      */
-    boolean resetHeadImage(ChatterGroup chatterGroup, int executeChatterId);
+    boolean resetHeadImage(ChatterGroup chatterGroup, String headImage);
 
     /**
      * 更改群名
      * @param chatterGroup
-     * @param executeChatterId
+     * @param groupName 新的群名
      * @return
      */
-    boolean resetGroupName(ChatterGroup chatterGroup, int executeChatterId);
+    boolean resetGroupName(ChatterGroup chatterGroup, String groupName);
 
     /**
      * 更改群公告
      * @param chatterGroup
-     * @param executeChatterId
+     * @param notice
      * @return
      */
-    boolean resetNotice(ChatterGroup chatterGroup, int executeChatterId);
+    boolean resetNotice(ChatterGroup chatterGroup, String notice);
 
     /**
-     * 更改群状态, 禁言, 群主发言等
+     * 更改群状态, 只允许群主发言等
      * @param chatterGroup
-     * @param executeChatterId
+     * @param state
      * @return
      */
-    boolean resetState(ChatterGroup chatterGroup, int executeChatterId);
+    boolean resetState(ChatterGroup chatterGroup, int state);
 
     /**
      * 更换群主
@@ -79,28 +111,9 @@ public interface ChatterGroupService {
     boolean resetOwner(ChatterGroup chatterGroup, int executeChatterId, int newOwnerId);
 
     /**
-     * 增加群成员
-     * @param chatterGroup
-     * @param chatterId 要加入的那个人的id
-     * @return
-     */
-    boolean addGroupMember(ChatterGroup chatterGroup, int chatterId);
-
-    /**
-     * 删除群成员
-     * @param chatterGroup
-     * @param chatterId
-     * @return
-     */
-    boolean deleteGroupMember(ChatterGroup chatterGroup, int chatterId);
-
-    /**
      * 获取某个人拥有的所有群组
      * @param chatterId
      * @return
      */
     List<ChatterGroup> getOwnChatterGroup(int chatterId);
-
-
-
 }

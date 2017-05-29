@@ -3,7 +3,7 @@ package cn.sourcecodes.chatterServer.dao.test;
 import cn.sourcecodes.chatterServer.dao.ChatterDao;
 import cn.sourcecodes.chatterServer.dao.impl.ChatterDaoImpl;
 import cn.sourcecodes.chatterServer.entity.Chatter;
-import cn.sourcecodes.chatterServer.entity.ChatterPrivate;
+import cn.sourcecodes.chatterServer.entity.ChatterPrivateInfo;
 import cn.sourcecodes.chatterServer.service.ChatterService;
 import cn.sourcecodes.chatterServer.service.impl.ChatterServiceImpl;
 import org.junit.After;
@@ -29,7 +29,7 @@ public class ChatterDaoImplTest {
         Chatter chatter = new Chatter();
         chatter.setAccount("54887894");
 
-        ChatterPrivate chatterPrivate = new ChatterPrivate();
+        ChatterPrivateInfo chatterPrivate = new ChatterPrivateInfo();
         chatterPrivate.setPassword("46456456");
 
         int isSuccess = chatterService.register(chatter, chatterPrivate);

@@ -1,10 +1,10 @@
 package cn.sourcecodes.chatterServer.dao.impl;
 
 import cn.sourcecodes.chatterServer.dao.ChatterDao;
-import cn.sourcecodes.chatterServer.dao.fieldInitializer.FieldInitializerFactory;
+import cn.sourcecodes.chatterServer.dao.utils.DaoUtils;
 import cn.sourcecodes.chatterServer.entity.Chatter;
-import cn.sourcecodes.chatterServer.entity.ChatterPrivate;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -13,108 +13,135 @@ import java.util.Map;
  */
 public class ChatterDaoImpl extends BaseDaoImpl<Chatter> implements ChatterDao {
 
+    private static ChatterDaoImpl instance;
+
+    private ChatterDaoImpl() {}
+
+    public static ChatterDaoImpl getInstance() {
+        if(instance == null) {
+            synchronized (ChatterDaoImpl.class) {
+                if(instance == null) {
+                    instance = new ChatterDaoImpl();
+                    return instance;
+                }
+            }
+        }
+
+        return instance;
+    }
+
     @Override
-    public boolean addChatter(Chatter chatter) {
-        String sql = "INSERT INTO chatter(" +
-                "account, headImage," +
-                "nickname, signature," +
-                "gender, region," +
+    public long addChatter(Chatter chatter) throws SQLException {
+        String sql = "INSERT INTO chatter (" +
+                " account, headImage," +
+                " nickname, signature," +
+                " gender, region," +
                 " createTime, phone)" +
-                "VALUES( ?, ?, ?, ?, ?, ?, ?, ?)";
+                " VALUES( ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        FieldInitializerFactory.getInitializer("ChatterFieldInitializer").initializeField(chatter);
-
-        int updatedRow = update(sql,
+        return insert(sql,
                 chatter.getAccount(), chatter.getHeadImage(),
                 chatter.getNickName(), chatter.getSignature(),
                 chatter.getGender(), chatter.getRegion(),
                 chatter.getCreateTime(), chatter.getPhone()
         );
-
-        return updatedRow != 0;
-    }
-
-    private int getChatterIdByAccount(String account) {
-        String sql = "SELECT id FROM chatter WHERE account = ?";
-        Chatter chatter = query(sql, account);
-        return chatter.getId();
     }
 
     @Override
-    public boolean deleteChatter(int id) {
+    public List<Long> addChatterList(List<Chatter> chatterList) throws SQLException {
+        Object[][] params = new Object[chatterList.size()][8];
+
+        for (int i = 0; i < chatterList.size(); i++) {
+            params[i][0] = chatterList.get(i).getAccount();
+            params[i][1] = chatterList.get(i).getHeadImage();
+            params[i][2] = chatterList.get(i).getNickName();
+            params[i][3] = chatterList.get(i).getSignature();
+            params[i][4] = chatterList.get(i).getGender();
+            params[i][5] = chatterList.get(i).getRegion();
+            params[i][6] = chatterList.get(i).getCreateTime();
+            params[i][7] = chatterList.get(i).getPhone();
+        }
+
+        String sql = "INSERT INTO chatter (" +
+                " account, headImage," +
+                " nickname, signature," +
+                " gender, region," +
+                " createTime, phone)" +
+                " VALUES( ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        return insertBatch(sql, params);
+    }
+
+    @Override
+    public boolean deleteChatterById(int id) throws SQLException {
         String sql = "DELETE FROM chatter WHERE id = ?";
 
-        int deleteRow = update(sql, id);
+        int deletedRow = update(sql, id);
 
-        return deleteRow != 0;
+        return deletedRow != 0;
     }
 
     @Override
-    public boolean deleteChatterByAccount(String account) {
+    public boolean deleteChatterByAccount(String account) throws SQLException {
         String sql = "DELETE FROM chatter WHERE account = ?";
 
-        int deleteRow = update(sql, account);
+        int deletedRow = update(sql, account);
 
-        return deleteRow != 0;
-    }
-
-    /**
-     * 这里有个很严重的bug, 在UserFieldInitializer 域初始化器中将phone初始化为"" 空串的,
-     * 所有没有设置phone域的用户的phone域都为"", 如果这里传入"" 这个参数, 那么数据库全部
-     * 用户记录都被删掉了...数据库中又不能设置unique约束...
-     * @param phone
-     * @return
-     */
-    @Override
-    public boolean deleteChatterByPhone(String phone) {
-        String sql = "DELETE FROM chatter WHERE phone = ?";
-
-        int deleteRow = update(sql, phone);
-
-        return deleteRow != 0;
+        return deletedRow != 0;
     }
 
     @Override
-    public Chatter getChatter(int id) {
+    public Chatter getChatterById(int id) throws SQLException {
         String sql = "SELECT * FROM chatter WHERE id = ?";
 
         return query(sql, id);
     }
 
     @Override
-    public Chatter getChatterByAccount(String account) {
+    public Chatter getChatterByAccount(String account) throws SQLException {
         String sql = "SELECT * FROM chatter WHERE account = ?";
 
         return query(sql, account);
     }
 
     @Override
-    public Chatter getChatterByPhone(String phone) {
+    public Chatter getChatterByPhone(String phone) throws SQLException {
         String sql = "SELECT * FROM chatter WHERE phone = ?";
 
         return query(sql, phone);
     }
 
     @Override
-    public boolean updateChatter(int id, String field, Object value) {
+    public boolean updateChatterById(int id, String field, Object value) throws SQLException {
         String sql = "UPDATE chatter SET " + field + " = ? WHERE id = ?";
 
         return update(sql, value, id) != 0;
     }
 
     @Override
-    public boolean updateChatter(int id, Map<String, Object> fieldValueMap) {
-        return false;
-    }
+    public boolean updateChatterById(int id, Map<String, Object> fieldValueMap) throws SQLException {
+        String queryString = null;
+        Object[] params = null;
+
+        Map<String, Object[]> generateMap = DaoUtils.generateQueryCondition(fieldValueMap);
+        if(generateMap == null) {
+            return false;
+        }
+
+        for (Map.Entry<String, Object[]> map :
+                generateMap.entrySet()) {
+            queryString = map.getKey();
+            params = map.getValue();
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("UPDATE chatter SET ");
+        stringBuilder.append(queryString);
+        stringBuilder.append(" WHERE id = ?");
+
+        String sql = stringBuilder.toString();
 
 
-    @Override
-    public boolean updateChatterByAccount(String account, Chatter chatter) {
-        return false;
-    }
-
-    @Override
-    public boolean updateChatterByPhone(String phone, Chatter chatter) {
-        return false;
+        return update(sql, params, id) != 0;
     }
 }

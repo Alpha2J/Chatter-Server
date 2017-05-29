@@ -36,7 +36,7 @@ public class TestUrlServlet extends HttpServlet {
             return;
         }
 
-        Integer id = Integer.valueOf(idStr);
+        java.lang.Integer id = java.lang.Integer.valueOf(idStr);
 
         Chatter chatter = chatterService.getChatter(id);
 

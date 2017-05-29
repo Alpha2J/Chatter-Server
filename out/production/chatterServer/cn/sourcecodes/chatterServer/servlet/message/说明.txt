@@ -1,3 +1,5 @@
+消息模块:
+
 消息同步机制(说明: 不允许允许单用户多地登录)
 初始化:
 1. 用户登录时, 账号和密码验证成功后
@@ -33,5 +35,39 @@ MessageNotifier进行线程安全设置的说明:
 servlet是单对象, 多线程的. web容器初始化一次servlet, 然后每次请求到来都会分配线程给不同请求, 那么就会有下面问题:
 1.
 线程a  用户a发送消息给用户b, 服务器将
+
+
+
+
+
+
+实体:
+Message实体:
+字段名             java类型             sql类型
+id                 int                  int not null primary key auto_increment
+uuid               String               varchar(50) not null     //用UUID类生成, 然后截取的字符串长度为32, 用50保险点
+messageType        int                  smallint(6) not null     //6位数字的smallint(规定Message常量的这两个字段int值位数不能大于6)
+contentType        int                  smallint(6) not null     //6位数字的smallint
+sendTime           java.util.Date       datetime    not null             //有日期有时间
+sendId             int                  int    not null
+receiveId          int                  int    not null
+content            String               varchar(255) 最大长度为255个字符(不是字节), 一个中文算一个字符   //mediumblob 2^24次方也就是16mb的数据(图片也存文件系统, 不存数据库了, 所以不用blob类型了)
+
+
+MessageNotifier 已读消息映射(和用户也就是chatter的映射)实体
+字段名                    java类型             sql类型
+id                        int                  int not null primary key auto_increment
+lastAccessMessageId       int                  int not null default -1 //-1 表示从来没有从消息表读取过消息
+lastNewMessageId          int                  int not null default -1 //-1表示没有登录
+hasNewMessage             boolean              //数据库中不要这个字段了, 登录进系统的时候直接用上次访问的消息id来查, 不用看这个字段了, 如果看这个字段, 那么用户不在线时, 新消息来还要访问这个表.  tinyint not null default 0 //0表示没有, mysql中, 如果java插入false, 那么表示为0, true表示为1
+chatterId                 int                  int not null unique //表示这个通知器是哪个用户的
+
+
+
+
+
+
+
+
 
 

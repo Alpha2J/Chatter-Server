@@ -1,12 +1,6 @@
 package cn.sourcecodes.chatterServer.dao.test;
 
-import cn.sourcecodes.chatterServer.dao.ChatterDao;
-import cn.sourcecodes.chatterServer.dao.impl.ChatterDaoImpl;
-import cn.sourcecodes.chatterServer.entity.Chatter;
-import cn.sourcecodes.chatterServer.entity.ChatterPrivate;
-import cn.sourcecodes.chatterServer.service.ChatterService;
 import cn.sourcecodes.chatterServer.service.ContactService;
-import cn.sourcecodes.chatterServer.service.impl.ChatterServiceImpl;
 import cn.sourcecodes.chatterServer.service.impl.ContactServiceImpl;
 import org.junit.After;
 import org.junit.Before;

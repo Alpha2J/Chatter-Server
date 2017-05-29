@@ -116,6 +116,7 @@ public class MessageReceiveServlet extends HttpServlet {
      * @return 返回上传后的文件路径
      */
     private String handleUpload(HttpServletRequest request) {
+        request.getParameter("");
         return null;
     }
 

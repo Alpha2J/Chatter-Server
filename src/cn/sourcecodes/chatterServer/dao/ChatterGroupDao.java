@@ -2,7 +2,7 @@ package cn.sourcecodes.chatterServer.dao;
 
 import cn.sourcecodes.chatterServer.entity.ChatterGroup;
 
-import java.util.List;
+import java.sql.SQLException;
 import java.util.Map;
 
 /**
@@ -11,53 +11,39 @@ import java.util.Map;
 public interface ChatterGroupDao {
 
     /**
-     * 增加群组
+     * 增加群组, 只增加群基本信息, 成员列表不在这操作
      * @param chatterGroup
      * @return
      */
-    boolean addChatterGroup(ChatterGroup chatterGroup);
+    long addChatterGroup(ChatterGroup chatterGroup) throws SQLException;
 
     /**
      * 删除群组
      * @param id
      * @return
      */
-    boolean deleteChatterGroup(int id);
+    boolean deleteChatterGroupById(int id) throws SQLException;
 
     /**
      * 通过账号删除群组
      * @param account
      * @return
      */
-    boolean deleteChatterGroupByAccount(String account);
+    boolean deleteChatterGroupByAccount(String account) throws SQLException;
 
     /**
-     * 获取群信息, 包括群成员(获取出来的群成员信息只有id字段)
+     * 获取群信息(群实体)
      * @param id
      * @return
      */
-    ChatterGroup getChatterGroup(int id);
-
-    /**
-     * 通过id获取指定的群组信息, 不获取群成员
-     * @param id
-     * @return
-     */
-    ChatterGroup getBasicChatterGroup(int id);
+    ChatterGroup getChatterGroupById(int id) throws SQLException;
 
     /**
      * 获取群信息, 包括群成员(获取出来的群成员信息只有id字段)
      * @param account
      * @return
      */
-    ChatterGroup getChatterGroupByAccount(String account);
-
-    /**
-     * 通过id获取指定的群组信息, 不获取群成员
-     * @param account
-     * @return
-     */
-    ChatterGroup getBasicChatterGroupByAccount(String account);
+    ChatterGroup getChatterGroupByAccount(String account) throws SQLException;
 
     /**
      * 更新群组的某一个字段信息
@@ -66,29 +52,12 @@ public interface ChatterGroupDao {
      * @param value
      * @return
      */
-    boolean updateChatterGroup(int id, String field, Object value);
+    boolean updateChatterGroupById(int id, String field, Object value) throws SQLException;
 
     /**
      * 根据id更新字段, 更新一组字段
      * @param id
      * @return
      */
-    boolean updateChatterGroup(int id, Map<String, Object> fieldValueMap);
-
-    /**
-     * 通过账号更改群组信息
-     * @param account
-     * @param field
-     * @param value
-     * @return
-     */
-    boolean updateChatterGroupByAccount(String account, String field, Object value);
-
-    /**
-     * 通过账号更改一组信息
-     * @param account
-     * @param fieldValueMap
-     * @return
-     */
-    boolean updateChatterGroupByAccount(String account, Map<String, Object> fieldValueMap);
+    boolean updateChatterGroupById(int id, Map<String, Object> fieldValueMap) throws SQLException;
 }

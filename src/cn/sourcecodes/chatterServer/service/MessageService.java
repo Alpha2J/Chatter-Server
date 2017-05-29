@@ -1,6 +1,7 @@
 package cn.sourcecodes.chatterServer.service;
 
 import cn.sourcecodes.chatterServer.entity.Message;
+import cn.sourcecodes.chatterServer.servlet.message.entity.MessageNotifier;
 
 import java.util.List;
 
@@ -18,12 +19,16 @@ public interface MessageService {
     long addMessage(Message message);
 
     /**
-     * 获取新的消息 包括群聊和私聊等所有id
-     * @param beginId  从哪个id开始消息是新的
-     * @param receiveId  消息的接收者是谁
+     * 获取某个人的未读消息 包括群聊和私聊等所有消息
+     * @param chatterId
      * @return
      */
-    List<Message> getNewMessages(int beginId, int receiveId);
+    List<Message> getUnReadMessages(int chatterId);
 
-
+    /**
+     * 更新消息的访问数据, 上次访问的最后一个消息id, 上次的新id
+     * @param messageNotifier
+     * @return
+     */
+    boolean updateMessageAccessData(MessageNotifier messageNotifier);
 }

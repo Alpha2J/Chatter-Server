@@ -1,8 +1,8 @@
 package cn.sourcecodes.chatterServer.dao;
 
 import cn.sourcecodes.chatterServer.entity.Chatter;
-import cn.sourcecodes.chatterServer.entity.ChatterPrivate;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -14,52 +14,52 @@ public interface ChatterDao {
     /**
      * 添加用户
      * @param chatter
+     * @return 刚添加的用户的id
+     */
+    long addChatter(Chatter chatter) throws SQLException;
+
+    /**
+     * 增加一组chatter(批量增加)
+     * @param chatterList
      * @return
      */
-    boolean addChatter(Chatter chatter);
+    List<Long> addChatterList(List<Chatter> chatterList) throws SQLException;
 
     /**
      * 通过id删除用户
      * @param id
      * @return 删除成功返回true 反之false
      */
-    boolean deleteChatter(int id);
+    boolean deleteChatterById(int id) throws SQLException;
 
     /**
      * 通过账号删除用户
      * @param account
      * @return
      */
-    boolean deleteChatterByAccount(String account);
-
-    /**
-     * 通过手机号删除用户
-     * @param phone
-     * @return
-     */
-    boolean deleteChatterByPhone(String phone);
+    boolean deleteChatterByAccount(String account) throws SQLException;
 
     /**
      * 通过id获取用户
      * @param id
      * @return
      */
-    Chatter getChatter(int id);
+    Chatter getChatterById(int id) throws SQLException;
 
     /**
-     * 通过登录账号获取User
+     * 通过登录账号获取Chatter
      * @param account
      * @return
      */
-    Chatter getChatterByAccount(String account);
+    Chatter getChatterByAccount(String account) throws SQLException;
 
     /**
-     * 通过手机号获取用户
+     * 通过登录手机号获取Chatter
      * @param phone
      * @return
+     * @throws SQLException
      */
-    Chatter getChatterByPhone(String phone);
-
+    Chatter getChatterByPhone(String phone) throws SQLException;
 
     /**
      * 根据用户id更新字段(只更新一个字段)
@@ -68,28 +68,12 @@ public interface ChatterDao {
      * @param value
      * @return
      */
-    boolean updateChatter(int id, String field, Object value);
+    boolean updateChatterById(int id, String field, Object value) throws SQLException;
 
     /**
      * 根据id更新字段, 更新一组字段
      * @param id
      * @return
      */
-    boolean updateChatter(int id, Map<String, Object> fieldValueMap);
-
-    /**
-     * 通过账号更改用户信息
-     * @param account
-     * @param chatter
-     * @return
-     */
-    boolean updateChatterByAccount(String account, Chatter chatter);
-
-    /**
-     * 通过手机号码更新用户信息
-     * @param phone
-     * @param chatter
-     * @return
-     */
-    boolean updateChatterByPhone(String phone, Chatter chatter);
+    boolean updateChatterById(int id, Map<String, Object> fieldValueMap) throws SQLException;
 }

@@ -16,7 +16,6 @@ import cn.sourcecodes.chatterServer.servlet.data.AppInitData;
 import cn.sourcecodes.chatterServer.util.JsonUtils;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,21 +47,21 @@ public class AppInitServlet extends HttpServlet {
         int flag; //flag 的数值表示异常代号, 1为id不是数字
 
         String chatterIdStr = request.getParameter("chatterId");
-        Integer chatterId;
+        java.lang.Integer integerId;
 
         response.setContentType("application/json;charset=utf-8");
         try {
-            chatterId = Integer.valueOf(chatterIdStr);//如果参数无法转换为int类型, 抛异常, 结束访问
+            integerId = java.lang.Integer.valueOf(chatterIdStr);//如果参数无法转换为int类型, 抛异常, 结束访问
         } catch(Exception e) {
             flag = 1;
             response.getWriter().println();
             return;
         }
 
-        Chatter chatter = chatterService.getChatter(chatterId);
-        List<ContactGroupType> contactGroupTypeList = contactGroupTypeService.getAllContactGroupType(chatterId);
-        List<Contact> contactList = contactService.findContacts(chatterId);
-        List<ChatterGroup> chatterGroupList = chatterGroupService.getOwnChatterGroup(chatterId);
+        Chatter chatter = chatterService.getChatter(integerId);
+        List<ContactGroupType> contactGroupTypeList = contactGroupTypeService.getAllContactGroupType(integerId);
+        List<Contact> contactList = contactService.findContacts(integerId);
+        List<ChatterGroup> chatterGroupList = chatterGroupService.getOwnChatterGroup(integerId);
 
         AppInitData appInitData = new AppInitData(chatter, contactGroupTypeList, contactList, chatterGroupList);
 

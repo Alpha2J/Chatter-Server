@@ -1,114 +1,330 @@
 package cn.sourcecodes.chatterServer.service.impl;
 
 import cn.sourcecodes.chatterServer.dao.ChatterDao;
-import cn.sourcecodes.chatterServer.dao.ChatterPrivateDao;
+import cn.sourcecodes.chatterServer.dao.ChatterPrivateInfoDao;
 import cn.sourcecodes.chatterServer.dao.impl.ChatterDaoImpl;
-import cn.sourcecodes.chatterServer.dao.impl.ChatterPrivateDaoImpl;
+import cn.sourcecodes.chatterServer.dao.impl.ChatterPrivateInfoDaoImpl;
 import cn.sourcecodes.chatterServer.entity.Chatter;
-import cn.sourcecodes.chatterServer.entity.ChatterPrivate;
+import cn.sourcecodes.chatterServer.entity.ChatterPrivateInfo;
 import cn.sourcecodes.chatterServer.service.ChatterService;
+import cn.sourcecodes.chatterServer.service.fieldInitializer.FieldInitializerFactory;
+import cn.sourcecodes.chatterServer.service.fieldValidator.FieldValidatorFactory;
+import cn.sourcecodes.chatterServer.servlet.validation.constant.ValidationConstant;
+
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Created by cn.sourcecodes on 2017/5/11.
  */
 public class ChatterServiceImpl implements ChatterService {
 
-    private ChatterDao chatterDao = new ChatterDaoImpl();
-    private ChatterPrivateDao chatterPrivateDao = new ChatterPrivateDaoImpl();
+    private static ChatterService instance;
 
-    //返回结果值, 如果为0 表示注册成功, 如果非0, 验证值, 1 账户重复, 2 phone重复等...
-    @Override
-    public int register(Chatter chatter, ChatterPrivate chatterPrivate) {
-        String account = chatter.getAccount();
-        String phone = chatter.getPhone();
-        if(chatterDao.getChatterByAccount(account) != null) {
-            return 1;
-        } else if(chatterDao.getChatterByPhone(phone) != null) {
-            return 2;
+    private ChatterServiceImpl() {}
+
+    public static ChatterService getInstance() {
+        if(instance == null) {
+            synchronized (ChatterServiceImpl.class) {
+                if(instance == null) {
+                    instance = new ChatterServiceImpl();
+                    return instance;
+                }
+            }
         }
 
-        boolean isSuccess = chatterDao.addChatter(chatter);
-        if(!isSuccess) {
+        return instance;
+    }
+
+
+    private ChatterDao chatterDao = ChatterDaoImpl.getInstance();
+    private ChatterPrivateInfoDao chatterPrivateInfoDao = ChatterPrivateInfoDaoImpl.getInstance();
+
+    /**
+     * 注册的时候只需要输入基本信息, 只检测密码是否为空
+     * @param chatter
+     * @param chatterPrivateInfo
+     * @return
+     */
+    @Override
+    public int register(Chatter chatter, ChatterPrivateInfo chatterPrivateInfo) {
+        //程序错误
+        if(chatter == null || chatterPrivateInfo == null) {
             return -1;
         }
 
+        //如果域检测不通过, 返回未知错误
+        if(!FieldValidatorFactory.getValidator("ChatterFieldValidator").validate(chatter)) {
+            return ValidationConstant.VALIDATION__REGISTER_FAIL_UNKNOWN_REASON;
+        }
+        //检测不通过, 说明密码域不符合规定, 返回未知错误
+        if(!FieldValidatorFactory.getValidator("ChatterPrivateInfoFieldValidator").validate(chatterPrivateInfo)) {
+            return ValidationConstant.VALIDATION__REGISTER_FAIL_UNKNOWN_REASON;
+        }
 
-        int id = chatterDao.getChatterByAccount(account).getId();
-        chatterPrivate.setChatterId(id);
+        //检测账号是否已经存在
+        if(checkAccountExist(chatter.getAccount())) {
+            return ValidationConstant.VALIDATION__REGISTER_FAIL_ACCOUNT_ALREADY_EXIST;
+        }
 
-        return chatterPrivateDao.addChatterPrivate(chatterPrivate) == true ? 0 : -1;
+        //如果注册时填写了手机号, 检测手机号是否已经存在
+        if(chatter.getPhone() != null) {
+            if(checkPhoneExist(chatter.getPhone())) {
+                return ValidationConstant.VALIDATION__REGISTER_FAIL_PHONE_ALREADY_EXIST;
+            }
+        }
+
+        //检测通过, 初始化非必须域, 保证不会在插入时抛空指针异常
+        FieldInitializerFactory.getInitializer("ChatterFieldInitializer").initializeField(chatter);
+
+        boolean isSuccess = false;
+        try {
+            //这块其实还可以做事务的, 万一chatter插入了, chatterPrivateInfo插入失败呢? 那刚插入的chatter就没有对应的密码等私有字段了.
+            long addedId = chatterDao.addChatter(chatter);
+            chatterPrivateInfo.setChatterId((int)addedId);
+            chatterPrivateInfoDao.addChatterPrivateInfo(chatterPrivateInfo);
+            isSuccess = true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        //如果执行的时候抛异常, 说明插入失败, 返回未知错误
+        return isSuccess ? ValidationConstant.VALIDATION__REGISTER_SUCCESS : ValidationConstant.VALIDATION__REGISTER_FAIL_UNKNOWN_REASON;
     }
 
     @Override
     public Chatter loginByAccount(String account, String password) {
-        Chatter chatter = chatterDao.getChatterByAccount(account);
-        if(chatter == null) {
-            return null;
-        } else {
+        try {
+            Chatter chatter = chatterDao.getChatterByAccount(account);
+            if(chatter == null) {
+                return null;
+            }
+
             int chatterId = chatter.getId();
-            ChatterPrivate chatterPrivate = chatterPrivateDao.getChatterPrivateByChatterId(chatterId);
-            return chatterPrivate.getPassword().equals(password) ? chatter : null;
+            ChatterPrivateInfo chatterPrivateInfo = chatterPrivateInfoDao.getChatterPrivateInfoById(chatterId);
+            if(chatterPrivateInfo == null) {
+                return null;
+            }
+
+            //如果密码符合, 返回chatter
+            if(chatterPrivateInfo.getPassword().equals(password)) {
+                return chatter;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+
+        //如果执行出异常, 返回null
+        return null;
     }
 
     @Override
     public Chatter loginByPhone(String phone, String password) {
-        Chatter chatter = chatterDao.getChatterByPhone(phone);
-        if(chatter == null) {
-            return null;
-        } else {
+        try {
+            //在ChatterFieldInitializer里面, 如果phone为null, 那么设置为""空串, 所有注册时没有设置phone的用户的phone字段都为""
+            //所有是"" 的话, 返回null, 不做处理
+            if(phone.equals("")) {
+                return null;
+            }
+
+            Chatter chatter = chatterDao.getChatterByPhone(phone);
+            if(chatter == null) {
+                return null;
+            }
+
             int chatterId = chatter.getId();
-            ChatterPrivate chatterPrivate = chatterPrivateDao.getChatterPrivateByChatterId(chatterId);
-            return chatterPrivate.getPassword().equals(password) ? chatter : null;
+            ChatterPrivateInfo chatterPrivateInfo = chatterPrivateInfoDao.getChatterPrivateInfoById(chatterId);
+            if(chatterPrivateInfo == null) {
+                return null;
+            }
+
+            //如果密码符合, 返回chatter
+            if(chatterPrivateInfo.getPassword().equals(password)) {
+                return chatter;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+
+        //如果执行出异常, 返回null
+        return null;
     }
 
     @Override
-    public boolean deRegister(int id) {
-        Chatter chatter = chatterDao.getChatter(id);
+    public Chatter findChatterById(int id) {
+        Chatter chatter = null;
+
+        try {
+            chatter = chatterDao.getChatterById(id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return chatter;
+    }
+
+    @Override
+    public boolean checkAccountExist(String account) {
+        Chatter chatter = null;
+
+        try {
+            chatter = chatterDao.getChatterByAccount(account);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        //存在返回true, 不存在返回false
         if(chatter == null) {
             return false;
         } else {
-            int chatterId = chatter.getId();
-
-            return chatterDao.deleteChatter(id) && chatterPrivateDao.deleteChatterPrivateByChatterId(chatterId);
+            return true;
         }
     }
 
     @Override
-    public Chatter getChatter(int id) {
-        return chatterDao.getChatter(id);
+    public boolean checkPhoneExist(String phone) {
+        Chatter chatter = null;
+
+        try {
+            chatter = chatterDao.getChatterByPhone(phone);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        //存在返回true, 不存在返回false
+        if(chatter == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    //这个方法重点检查
+    @Override
+    public boolean updateInfo(Chatter chatter) {
+        //域没检查通过, 返回false
+        if(!FieldValidatorFactory.getValidator("ChatterFieldValidator").validate(chatter)) {
+            return false;
+        }
+
+        Map<String, Object> fieldValueMap = new HashMap<>();
+        fieldValueMap.put("headImage", chatter.getHeadImage());
+        fieldValueMap.put("nickName", chatter.getNickName());
+        fieldValueMap.put("signature", chatter.getSignature());
+        fieldValueMap.put("gender", chatter.getSignature());
+        fieldValueMap.put("region", chatter.getSignature());
+
+        boolean isSuccess = false;
+        try {
+            isSuccess = chatterDao.updateChatterById(chatter.getId(), fieldValueMap);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return isSuccess;
     }
 
     @Override
-    public boolean resetPassword(int id, String newPassword) {
-        chatterPrivateDao.updateChatterPrivateByChatterId(id, "password", newPassword);
-        return false;
+    public boolean resetPassword(int id, String password) {
+        if(password == null) {
+            return false;
+        }
+
+        //大小写字母, 符号@#$%^*   6到40个字符
+        if(!Pattern.matches("^[a-zA-Z0-9@#$%!\\^*]{6,40}$", password)) {
+            return false;
+        }
+
+        boolean isSuccess = false;
+        try {
+            isSuccess = chatterPrivateInfoDao.updateChatterPrivateInfoById(id, "password", password);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return isSuccess;
     }
 
     @Override
-    public boolean resetHeadImage(int id, String newHeadImage) {
-        return false;
+    public boolean resetHeadImage(int id, String headImage) {
+        if(headImage == null || headImage.length() > 255) {
+            return false;
+        }
+
+        boolean isSuccess = false;
+        try {
+            isSuccess = chatterDao.updateChatterById(id, "headImage", headImage);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return isSuccess;
     }
 
     @Override
-    public boolean resetNickName(int id, String newNickName) {
-        return false;
+    public boolean resetNickName(int id, String nickName) {
+        if(nickName == null || nickName.length() > 20) {
+            return false;
+        }
+
+        boolean isSuccess = false;
+        try {
+            isSuccess = chatterDao.updateChatterById(id, "nickName", nickName);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return isSuccess;
     }
 
     @Override
     public boolean resetSignature(int id, String signature) {
-        return false;
+        if(signature == null || signature.length() > 255) {
+            return false;
+        }
+
+        boolean isSuccess = false;
+        try {
+            isSuccess = chatterDao.updateChatterById(id, "signature", signature);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return isSuccess;
     }
 
     @Override
     public boolean resetGender(int id, String gender) {
-        return false;
+        if(gender == null || gender.length() > 10) {
+            return false;
+        }
+
+        boolean isSuccess = false;
+        try {
+            isSuccess = chatterDao.updateChatterById(id, "gender", gender);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return isSuccess;
     }
 
     @Override
     public boolean resetRegion(int id, String region) {
-        return false;
+        if(region == null || region.length() > 50) {
+            return false;
+        }
+
+        boolean isSuccess = false;
+        try {
+            isSuccess = chatterDao.updateChatterById(id, "region", region);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return isSuccess;
     }
 
     @Override
@@ -118,6 +334,22 @@ public class ChatterServiceImpl implements ChatterService {
 
     @Override
     public boolean resetPhone(int id, String phone) {
-        return false;
+        if(phone == null || phone.length() > 30) {
+            return false;
+        }
+
+        //如果该手机号已经存在, 不允许更改
+        if(checkPhoneExist(phone)) {
+            return false;
+        }
+
+        boolean isSuccess = false;
+        try {
+            isSuccess = chatterDao.updateChatterById(id, "phone", phone);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return isSuccess;
     }
 }

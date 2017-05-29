@@ -12,12 +12,15 @@ package cn.sourcecodes.chatterServer.servlet.validation.constant;
 public class ValidationConstant {
     //注册
     public static final int VALIDATION__REGISTER_SUCCESS = 1;//注册成功
-    public static final int VALIDATION__REGISTER_FAIL = 2;//注册失败
+    //注册失败
+    public static final int VALIDATION__REGISTER_FAIL_ACCOUNT_ALREADY_EXIST = 2;//账号已经存在
+    public static final int VALIDATION__REGISTER_FAIL_PHONE_ALREADY_EXIST = 3;//手机号已经存在
+    //未知原因(数据正确性在客户端进行验证, 如果不经过客户端验证, 发了不合法的字符, 那么同一返回未知原因
+    public static final int VALIDATION__REGISTER_FAIL_UNKNOWN_REASON = 4;
 
     //成功
     public static final int VALIDATION__LOGIN_SUCCESS = 101;//登录成功
     public static final int VALIDATION__LOGIN_FAIL = 102;//登录失败
-//    public static final int
 
     //参数解析错误, 比如int类型的chatterId传了文本进来, 或者找不到参数
     public static final int VALIDATION__PARAMETER_RESOLVE_ERROR = 1001;

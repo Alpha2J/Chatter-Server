@@ -3,14 +3,33 @@ package cn.sourcecodes.chatterServer.dao.impl;
 import cn.sourcecodes.chatterServer.dao.MessageNotifierDao;
 import cn.sourcecodes.chatterServer.servlet.message.entity.MessageNotifier;
 
+import java.sql.SQLException;
 import java.util.Map;
 
 /**
  * Created by cn.sourcecodes on 2017/5/26.
  */
 public class MessageNotifierDaoImpl extends BaseDaoImpl<MessageNotifier> implements MessageNotifierDao {
+
+    private static MessageNotifierDaoImpl instance;
+
+    private MessageNotifierDaoImpl() {}
+
+    public static MessageNotifierDaoImpl getInstance() {
+        if(instance == null) {
+            synchronized (MessageNotifierDaoImpl.class) {
+                if(instance == null) {
+                    instance = new MessageNotifierDaoImpl();
+                    return instance;
+                }
+            }
+        }
+
+        return instance;
+    }
+
     @Override
-    public long addMessageNotifier(MessageNotifier messageNotifier) {
+    public long addMessageNotifier(MessageNotifier messageNotifier) throws SQLException {
         String sql = "INSERT INTO chatterNotifierMapping(" +
                 "chatterId, lastAccessMessageId, lastNewMessageId) " +
                 "VALUES(?, ?, ?)";
@@ -23,7 +42,7 @@ public class MessageNotifierDaoImpl extends BaseDaoImpl<MessageNotifier> impleme
     }
 
     @Override
-    public boolean deleteMessageNotifierById(int id) {
+    public boolean deleteMessageNotifierById(int id) throws SQLException {
         String sql = "DELETE FROM chatterNotifierMapping WHERE id = ?";
 
         int updatedRow = update(sql, id);
@@ -32,7 +51,7 @@ public class MessageNotifierDaoImpl extends BaseDaoImpl<MessageNotifier> impleme
     }
 
     @Override
-    public boolean deleteMessageNotifierByChatterId(int chatterId) {
+    public boolean deleteMessageNotifierByChatterId(int chatterId) throws SQLException {
         String sql = "DELETE FROM chatterNotifierMapping WHERE chatterId = ?";
 
         int updatedRow = update(sql, chatterId);
@@ -41,7 +60,7 @@ public class MessageNotifierDaoImpl extends BaseDaoImpl<MessageNotifier> impleme
     }
 
     @Override
-    public MessageNotifier getMessageNotifierById(int id) {
+    public MessageNotifier getMessageNotifierById(int id) throws SQLException {
         String sql = "SELECT " +
                 "id, chatterId, lastAccessMessageId, lastNewMessageId " +
                 "FROM chatterNotifierMapping " +
@@ -53,7 +72,7 @@ public class MessageNotifierDaoImpl extends BaseDaoImpl<MessageNotifier> impleme
     }
 
     @Override
-    public MessageNotifier getMessageNotifierByChatterId(int chatterId) {
+    public MessageNotifier getMessageNotifierByChatterId(int chatterId) throws SQLException {
         String sql = "SELECT " +
                 "id, chatterId, lastAccessMessageId, lastNewMessageId " +
                 "FROM chatterNotifierMapping " +
@@ -65,7 +84,7 @@ public class MessageNotifierDaoImpl extends BaseDaoImpl<MessageNotifier> impleme
     }
 
     @Override
-    public boolean updateMessageNotifier(MessageNotifier messageNotifier) {
+    public boolean updateMessageNotifier(MessageNotifier messageNotifier) throws SQLException {
         String sql = "UPDATE chatterNotifierMapping " +
                 "SET " +
                 "lastAccessMessageId = ?, lastNewMessageId = ? " +
@@ -80,26 +99,16 @@ public class MessageNotifierDaoImpl extends BaseDaoImpl<MessageNotifier> impleme
     }
 
     @Override
-    public boolean updateMessageNotifierById(int id, String field, Object value) {
+    public boolean updateMessageNotifierById(int id, String field, Object value) throws SQLException {
         String sql = "UPDATE chatterNotifierMapping SET " + field + " = ? WHERE id = ?";
 
         return update(sql, value, id) != 0;
     }
 
     @Override
-    public boolean updateMessageNotifierById(int id, Map<String, Object> fieldValueMap) {
-        return false;
-    }
-
-    @Override
-    public boolean updateMessageNotifierByChatterId(int chatterId, String field, Object value) {
+    public boolean updateMessageNotifierByChatterId(int chatterId, String field, Object value) throws SQLException {
         String sql = "UPDATE chatterNotifierMapping SET " + field + " = ? WHERE chatterId = ?";
 
         return update(sql, value, chatterId) != 0;
-    }
-
-    @Override
-    public boolean updateMessageNotifierByChatterId(int id, Map<String, Object> fieldValueMap) {
-        return false;
     }
 }

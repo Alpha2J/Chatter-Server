@@ -35,7 +35,7 @@ public class ContactGroupTypeServiceImpl implements ContactGroupTypeService {
         }
 
         int chatterId = contactGroupType.getChatterId();
-        Chatter chatter = chatterDao.getChatter(chatterId);
+        Chatter chatter = chatterDao.getChatterById(chatterId);
 
         //如果不存在这个chatter, 那么增加失败
         if(null == chatter) {

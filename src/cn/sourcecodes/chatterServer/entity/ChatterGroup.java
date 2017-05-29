@@ -15,7 +15,7 @@ public class ChatterGroup {
     private Date createTime;
     private int state;  //群状态, 禁言, 仅允许群主发言等
     private int groupOwnerId;//群主, 不做管理员了.
-    private List<Chatter> groupMember;//群成员
+    private List<Integer> groupMember;//群成员
 
     public int getId() {
         return id;
@@ -81,11 +81,11 @@ public class ChatterGroup {
         this.groupOwnerId = groupOwnerId;
     }
 
-    public List<Chatter> getGroupMember() {
+    public List<Integer> getGroupMember() {
         return groupMember;
     }
 
-    public void setGroupMember(List<Chatter> groupMember) {
+    public void setGroupMember(List<Integer> groupMember) {
         this.groupMember = groupMember;
     }
 }
