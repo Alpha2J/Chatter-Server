@@ -1,6 +1,8 @@
 package cn.sourcecodes.chatterServer.listener;
 
 import cn.sourcecodes.chatterServer.entity.Chatter;
+import cn.sourcecodes.chatterServer.service.MessageService;
+import cn.sourcecodes.chatterServer.service.impl.MessageServiceImpl;
 import cn.sourcecodes.chatterServer.servlet.message.entity.MessageNotifier;
 
 import javax.servlet.ServletContextEvent;
@@ -16,8 +18,8 @@ public class MyServletListener implements ServletContextListener,
         HttpSessionListener, HttpSessionAttributeListener {
 
     //用来保存chatterId 和 已登录用户的MessageNotifier 的映射map
-    private Map<java.lang.Integer, MessageNotifier> chatterNotifierMap;
-    private MessageNotifierService messageNotifierService;
+    private Map<Integer, MessageNotifier> chatterNotifierMap;
+    private MessageService messageService;
 
     // Public constructor is required by servlet spec
     public MyServletListener() {
@@ -30,7 +32,7 @@ public class MyServletListener implements ServletContextListener,
         this.chatterNotifierMap = new HashMap<>();
         sce.getServletContext().setAttribute("chatterNotifierMap", chatterNotifierMap);
 
-        this.messageNotifierService = new MessageNotifierServiceImpl();
+        this.messageService = MessageServiceImpl.getInstance();
     }
 
     public void contextDestroyed(ServletContextEvent sce) {
@@ -45,7 +47,6 @@ public class MyServletListener implements ServletContextListener,
     }
 
     public void sessionDestroyed(HttpSessionEvent se) {
-        System.out.println("session invalidate");
         HttpSession session = se.getSession();
         Object object = session.getAttribute("chatter");
 
@@ -58,7 +59,7 @@ public class MyServletListener implements ServletContextListener,
         int chatterId = chatter.getId();
 
         MessageNotifier messageNotifier = chatterNotifierMap.get(chatterId);
-        messageNotifierService.updateMessageAccessData(messageNotifier);//更新数据
+        messageService.updateMessageAccessData(messageNotifier);//更新数据
 
         chatterNotifierMap.remove(chatterId);
     }

@@ -3,6 +3,7 @@ package cn.sourcecodes.chatterServer.dao.impl;
 import cn.sourcecodes.chatterServer.dao.ContactGroupTypeDao;
 import cn.sourcecodes.chatterServer.entity.ContactGroupType;
 
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -10,17 +11,33 @@ import java.util.List;
  */
 public class ContactGroupTypeDaoImpl extends BaseDaoImpl<ContactGroupType> implements ContactGroupTypeDao {
 
+    private static ContactGroupTypeDaoImpl instance;
+
+    private ContactGroupTypeDaoImpl() {}
+
+    public static ContactGroupTypeDaoImpl getInstance() {
+        if(instance == null) {
+            synchronized (ContactGroupTypeDaoImpl.class) {
+                if(instance == null) {
+                    instance = new ContactGroupTypeDaoImpl();
+                    return instance;
+                }
+            }
+        }
+
+        return instance;
+    }
+
+
     @Override
-    public boolean addContactGroupType(int chatterId, String typeName) {
+    public long addContactGroupType(int chatterId, String typeName) throws SQLException {
         String sql = "INSERT INTO contactGroupType(chatterId, typeName) VALUES( ?, ? )";
 
-        int updatedRow = update(sql, chatterId, typeName);
-
-        return updatedRow != 0;
+        return insert(sql, chatterId, typeName);
     }
 
     @Override
-    public boolean deleteContactGroupType(int id) {
+    public boolean deleteContactGroupType(int id) throws SQLException {
         String sql = "DELETE FROM contactGroupType WHERE id = ?";
 
         int updatedRow = update(sql, id);
@@ -29,29 +46,23 @@ public class ContactGroupTypeDaoImpl extends BaseDaoImpl<ContactGroupType> imple
     }
 
     @Override
-    public ContactGroupType getContactGroupType(int id) {
-        String sql = "SELECT * FROM contactGroupType WHERE id = ?";
+    public ContactGroupType getContactGroupType(int id) throws SQLException {
+        String sql = "SELECT id, chatterId, typeName FROM contactGroupType WHERE id = ?";
 
-        ContactGroupType contactGroupType = query(sql, id);
-
-        return contactGroupType;
+        return query(sql, id);
     }
 
     @Override
-    public List<ContactGroupType> getAllContactGroupType(int chatterId) {
-        String sql = "SELECT * FROM contactGroupType WHERE chatterId = ?";
+    public List<ContactGroupType> getAllContactGroupType(int chatterId) throws SQLException {
+        String sql = "SELECT id, chatterId, typeName FROM contactGroupType WHERE chatterId = ?";
 
-        List<ContactGroupType> contactGroupTypeList = queryForList(sql, chatterId);
-
-        return contactGroupTypeList;
+        return queryForList(sql, chatterId);
     }
 
     @Override
-    public boolean updateContactGroupType(int id, String field, Object value) {
+    public boolean updateContactGroupType(int id, String field, Object value) throws SQLException {
         String sql = "UPDATE contactGroupType SET " + field + " = ? WHERE id = ?";
 
-        int updatedRow = update(sql, value, id);
-
-        return updatedRow != 0;
+        return update(sql, value, id) != 0;
     }
 }

@@ -167,6 +167,10 @@ public class ChatterServiceImpl implements ChatterService {
 
     @Override
     public boolean checkAccountExist(String account) {
+        if(account == null || account.length() > 20) {
+            return false;
+        }
+
         Chatter chatter = null;
 
         try {

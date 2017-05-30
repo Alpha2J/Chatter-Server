@@ -2,6 +2,7 @@ package cn.sourcecodes.chatterServer.dao.impl;
 
 import cn.sourcecodes.chatterServer.dao.MessageDao;
 import cn.sourcecodes.chatterServer.entity.Message;
+import cn.sourcecodes.chatterServer.servlet.message.constant.MessageConstant;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -86,13 +87,38 @@ public class MessageDaoImpl extends BaseDaoImpl<Message> implements MessageDao {
 
     @Override
     public List<Message> getMessageByReceiveId(int receiveId, int beginId) throws SQLException {
+        String sql = "SELECT m.id, m.uuid, m.messageType, m.contentType, m.sendTime, m.sendId, m.receiveId, m.content " +
+                "FROM message AS m " +
+                "LEFT JOIN chatterGroupMapping AS cgm " +
+                "ON m.receiveId = cgm.chatterGroupId " +
+                "WHERE " +
+                "(m.messageType = ? AND m.id > ? AND cgm.chatterId = ?) OR (m.messageType = ? AND m.id > ? AND m.receiveId = ? )";
+
+        return queryForList(sql,
+                MessageConstant.MESSAGE__TYPE_GROUP, beginId, receiveId,
+                MessageConstant.MESSAGE__TYPE_PRIVATE, beginId, receiveId
+                );
+    }
+
+    @Override
+    public List<Message> getGroupMessageByReceiveId(int receiveId, int beginId) throws SQLException {
+        String sql = "SELECT " +
+                "m.id, m.uuid, m.messageType, m.contentType, m.sendTime, m.sendId, m.receiveId, m.content " +
+                "FROM message AS m " +
+                "LEFT JOIN chatterGroupMapping AS cgm " +
+                "ON m.receiveId = cgm.chatterGroupId " +
+                "WHERE messageType = ? AND m.id > ? AND cgm.chatterId = ?";
+
+        return queryForList(sql, MessageConstant.MESSAGE__TYPE_GROUP, beginId, receiveId);
+    }
+
+    @Override
+    public List<Message> getPrivateMessageByReceiveId(int receiveId, int beginId) throws SQLException {
         String sql = "SELECT " +
                 "id, uuid, messageType, contentType, sendTime, sendId, receiveId, content " +
-                "FROM message WHERE receiveId = ? AND id > ?";
+                "FROM message WHERE messageType = ? AND id > ? AND receiveId = ?";
 
-        List<Message> messageList = queryForList(sql, receiveId, beginId);
-
-        return messageList;
+        return queryForList(sql, MessageConstant.MESSAGE__TYPE_PRIVATE, beginId, receiveId);
     }
 
     @Override

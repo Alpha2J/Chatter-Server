@@ -2,12 +2,30 @@ package cn.sourcecodes.chatterServer.service;
 
 import cn.sourcecodes.chatterServer.entity.Contact;
 
+import java.sql.SQLException;
 import java.util.List;
 
 /**
  * Created by cn.sourcecodes on 2017/5/20.
  */
 public interface ContactService {
+
+    /**
+     * 增加好友
+     * @param chatterId
+     * @param contact
+     * @return
+     */
+    boolean addContact(int chatterId, Contact contact);
+
+    /**
+     * 删除某个人的好友
+     * @param chatterId
+     * @param contactId
+     * @return
+     */
+    boolean deleteContact(int chatterId, int contactId);
+
     /**
      * 获取该chatter的所有联系人
      * @param chatterId
@@ -30,7 +48,7 @@ public interface ContactService {
      * @param newRemark
      * @return
      */
-    boolean resetRemark(int chatterId, int contactId, String newRemark);
+    boolean resetRemark(int chatterId, int contactId, String newRemark) throws SQLException;
 
     /**
      * 更新分组

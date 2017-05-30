@@ -19,6 +19,24 @@ import java.util.List;
  */
 public class MessageServiceImpl implements MessageService {
 
+    private static MessageServiceImpl instance;
+
+    private MessageServiceImpl() {}
+
+    public static MessageServiceImpl getInstance() {
+        if(instance == null) {
+            synchronized (MessageServiceImpl.class) {
+                if(instance == null) {
+                    instance = new MessageServiceImpl();
+                    return instance;
+                }
+            }
+        }
+
+        return instance;
+    }
+
+
     private MessageDao messageDao = MessageDaoImpl.getInstance();
     private MessageNotifierDao messageNotifierDao = MessageNotifierDaoImpl.getInstance();
 
@@ -61,6 +79,57 @@ public class MessageServiceImpl implements MessageService {
         }
 
         return messageList;
+    }
+
+    @Override
+    public List<Message> getUnReadGroupMessage(int chatterId) {
+        List<Message> messageList = null;
+
+        try {
+            MessageNotifier messageNotifier = messageNotifierDao.getMessageNotifierByChatterId(chatterId);
+            if(messageNotifier == null) {
+                return null;
+            }
+
+            int beginId = messageNotifier.getLastAccessMessageId();
+            messageList = messageDao.getGroupMessageByReceiveId(chatterId, beginId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return messageList;
+    }
+
+    @Override
+    public List<Message> getUnReadPrivateMessage(int chatterId) {
+        List<Message> messageList = null;
+
+        try {
+            MessageNotifier messageNotifier = messageNotifierDao.getMessageNotifierByChatterId(chatterId);
+            if(messageNotifier == null) {
+                return null;
+            }
+
+            int beginId = messageNotifier.getLastAccessMessageId();
+            messageList = messageDao.getPrivateMessageByReceiveId(chatterId, beginId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return messageList;
+    }
+
+    @Override
+    public MessageNotifier getLastMessageAccessData(int chatterId) {
+        MessageNotifier messageNotifier = null;
+
+        try {
+            messageNotifier = messageNotifierDao.getMessageNotifierByChatterId(chatterId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return messageNotifier;
     }
 
     @Override

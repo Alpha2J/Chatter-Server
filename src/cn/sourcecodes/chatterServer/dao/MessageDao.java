@@ -48,12 +48,30 @@ public interface MessageDao {
     Message getMessageByUuid(String uuid) throws SQLException;
 
     /**
-     * 通过接收者的id获取从beginId 开始的所有消息
+     * 通过接收者的id获取从beginId 开始的所有消息, 包括群聊消息和私聊消息
      * @param receiveId
      * @param beginId
      * @return
      */
     List<Message> getMessageByReceiveId(int receiveId, int beginId) throws SQLException;
+
+    /**
+     * 通过接收者id获取所有的从 beginId 开始的群聊消息
+     * @param receiveId
+     * @param beginId
+     * @return
+     * @throws SQLException
+     */
+    List<Message> getGroupMessageByReceiveId(int receiveId, int beginId) throws SQLException;
+
+    /**
+     * 通过接收者id获取所有的从 beginId 开始的私聊消息
+     * @param receiveId
+     * @param beginId
+     * @return
+     * @throws SQLException
+     */
+    List<Message> getPrivateMessageByReceiveId(int receiveId, int beginId) throws SQLException;
 
     /**
      * 通过id更新指定字段

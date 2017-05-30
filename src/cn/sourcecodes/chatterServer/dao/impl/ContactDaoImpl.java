@@ -3,6 +3,7 @@ package cn.sourcecodes.chatterServer.dao.impl;
 import cn.sourcecodes.chatterServer.dao.ContactDao;
 import cn.sourcecodes.chatterServer.entity.Contact;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -10,22 +11,34 @@ import java.util.Map;
  * Created by cn.sourcecodes on 2017/5/20.
  */
 public class ContactDaoImpl extends BaseDaoImpl<Contact> implements ContactDao {
-    @Override
-    public boolean addContact(int chatterId, int contactId) {
-        return addContact(chatterId, contactId, 1);//这里不能写0, 数据库insert的时候不论id是不是写0, 设置了autoIncrement都是1开始
+
+    private static ContactDaoImpl instance;
+
+    private ContactDaoImpl() {}
+
+    public static ContactDaoImpl getInstance() {
+        if(instance == null) {
+            synchronized (ContactDaoImpl.class) {
+                if(instance == null) {
+                    instance = new ContactDaoImpl();
+                    return instance;
+                }
+            }
+        }
+
+        return instance;
     }
 
+
     @Override
-    public boolean addContact(int chatterId, int contactId, int contactGroupTypeId) {
+    public long addContact(int chatterId, int contactId, int contactGroupTypeId) throws SQLException {
         String sql = "INSERT INTO contactMapping(chatterId, contactId, contactGroupTypeId) VALUES( ?, ?, ?)";
 
-        int updatedRow = update(sql, chatterId, contactId, contactGroupTypeId);
-
-        return updatedRow != 0;
+        return insert(sql, chatterId, contactId, contactGroupTypeId);
     }
 
     @Override
-    public boolean deleteContact(int chatterId, int contactId) {
+    public boolean deleteContact(int chatterId, int contactId) throws SQLException {
         String sql = "DELETE FROM contactMapping WHERE chatterId = ? AND contactId = ?";
 
         int updatedRow = update(sql, chatterId, contactId);
@@ -34,7 +47,7 @@ public class ContactDaoImpl extends BaseDaoImpl<Contact> implements ContactDao {
     }
 
     @Override
-    public Contact getContact(int chatterId, int contactId) {
+    public Contact getContact(int chatterId, int contactId) throws SQLException {
         String sql = "SELECT " +
                 "contact.id, contact.phone, contact.headImage, contact.nickname, contact.gender, contact.signature, contact.region, contactGroupTypeId, remark " +
                 "FROM contactMapping " +
@@ -43,13 +56,11 @@ public class ContactDaoImpl extends BaseDaoImpl<Contact> implements ContactDao {
                 "ON contact.id = contactId " +
                 "WHERE chatterId = ? AND contactId = ?";
 
-        Contact contact = query(sql, chatterId, contactId);
-
-        return contact;
+        return query(sql, chatterId, contactId);
     }
 
     @Override
-    public List<Contact> getContactList(int chatterId) {
+    public List<Contact> getContactList(int chatterId) throws SQLException {
         String sql = "SELECT " +
                 "contact.id, contact.phone, contact.headImage, contact.nickname, contact.gender, contact.signature, contact.region, contactGroupTypeId, remark " +
                 "FROM contactMapping " +
@@ -58,22 +69,13 @@ public class ContactDaoImpl extends BaseDaoImpl<Contact> implements ContactDao {
                 "ON contact.id = contactId " +
                 "WHERE chatterId = ?";
 
-        List<Contact> contactList = queryForList(sql, chatterId);
-
-        return contactList;
+        return queryForList(sql, chatterId);
     }
 
     @Override
-    public boolean updateContact(int chatterId, int contactId, String field, Object value) {
-        String sql = "UPDATE contactMapping SET " + field + " = ? WHERE chatterId = ? AND contactId = ?";
+    public boolean updateContact(int chatterId, int contactId, String field, Object value) throws SQLException {
+        String sql = "UPDATE contactMapping SET " + field + " = ? WHERE chatterId = ? AND contactId =  ?";
 
-        int updatedRow = update(sql, value, chatterId, contactId);
-
-        return updatedRow != 0;
-    }
-
-    @Override
-    public boolean updateContact(int chatterId, int contactId, Map<String, Object> fieldValueMap) {
-        return false;
+        return update(sql, value, chatterId, contactId) != 0;
     }
 }

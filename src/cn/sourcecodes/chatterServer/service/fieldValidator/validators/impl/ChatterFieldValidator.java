@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  * 验证包括:
  * 1. 各字段是否为空验证(不进行验证会导致空指针异常)
  * 2. 长度验证
- * 各个字段的长度在cn.sourcecodes.chatterServer.servlet.validation包的"说明.txt"文件中列出
+ * 各个字段的长度在cn.sourcecodes.chatterServer.servlet.validation包的"readme.txt"文件中列出
  *
  *
  * Created by cn.sourcecodes on 2017/5/28.

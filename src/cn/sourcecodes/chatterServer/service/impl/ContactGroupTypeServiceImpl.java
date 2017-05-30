@@ -9,71 +9,102 @@ import cn.sourcecodes.chatterServer.entity.ContactGroupType;
 import cn.sourcecodes.chatterServer.service.ContactGroupTypeService;
 
 import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
  * Created by cn.sourcecodes on 2017/5/20.
  */
 public class ContactGroupTypeServiceImpl implements ContactGroupTypeService {
-    private ContactGroupTypeDao contactGroupTypeDao = new ContactGroupTypeDaoImpl();
-    private ChatterDao chatterDao = new ChatterDaoImpl();
+    private ContactGroupTypeDao contactGroupTypeDao = ContactGroupTypeDaoImpl.getInstance();
+    private ChatterDao chatterDao = ChatterDaoImpl.getInstance();
 
     @Override
     public boolean addContactGroupType(ContactGroupType contactGroupType) {
-        String typeName = contactGroupType.getTypeName();
-        if(typeName == null) {
-            typeName = "未命名分组";
-        }
-
-        //字节长度不能大于30不能大于10
-        try {
-            if(typeName.getBytes("utf-8").length > 30) {
-                return false;
-            }
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        int chatterId = contactGroupType.getChatterId();
-        Chatter chatter = chatterDao.getChatterById(chatterId);
-
-        //如果不存在这个chatter, 那么增加失败
-        if(null == chatter) {
+        if(contactGroupType == null) {
             return false;
         }
 
-        return contactGroupTypeDao.addContactGroupType(contactGroupType.getChatterId(), contactGroupType.getTypeName());
+        String typeName = contactGroupType.getTypeName();
+        if(typeName != null && typeName.length() > 50) {
+            return false;
+        }
+
+        if(typeName == null) {
+            typeName = "默认分组";
+        }
+
+
+        boolean isSuccess = false;
+        try {
+            int chatterId = contactGroupType.getChatterId();
+            Chatter chatter = chatterDao.getChatterById(chatterId);
+            //如果不存在这个chatter, 那么增加失败
+            if(chatter == null) {
+                return isSuccess;
+            }
+
+            contactGroupTypeDao.addContactGroupType(contactGroupType.getChatterId(), contactGroupType.getTypeName());
+            isSuccess = true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return isSuccess;
     }
 
     @Override
     public boolean deleteContactGroup(int contactGroupId) {
-        return contactGroupTypeDao.deleteContactGroupType(contactGroupId);
+        boolean isSuccess = false;
+        try {
+            isSuccess = contactGroupTypeDao.deleteContactGroupType(contactGroupId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return isSuccess;
     }
 
     @Override
     public ContactGroupType getContactGroupType(int contactGroupId) {
-        return contactGroupTypeDao.getContactGroupType(contactGroupId);
+        ContactGroupType contactGroupType = null;
+
+        try {
+            contactGroupType = contactGroupTypeDao.getContactGroupType(contactGroupId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return contactGroupType;
     }
 
     @Override
     public List<ContactGroupType> getAllContactGroupType(int chatterId) {
-        return contactGroupTypeDao.getAllContactGroupType(chatterId);
+        List<ContactGroupType> contactGroupTypeList = null;
+
+        try {
+            contactGroupTypeList = contactGroupTypeDao.getAllContactGroupType(chatterId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return contactGroupTypeList;
     }
 
     @Override
     public boolean renameContactGroup(int contactGroupId, String typeName) {
-        if(typeName == null) {
+        if(typeName == null || typeName.length() > 50) {
             return false;
         }
 
+        boolean isSuccess = false;
+
         try {
-            if(typeName.getBytes("utf-8").length > 30) {
-                return false;
-            }
-        } catch (UnsupportedEncodingException e) {
+            isSuccess = contactGroupTypeDao.updateContactGroupType(contactGroupId, "typeName", typeName);
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return contactGroupTypeDao.updateContactGroupType(contactGroupId, "typeName", typeName);
+        return isSuccess;
     }
 }
