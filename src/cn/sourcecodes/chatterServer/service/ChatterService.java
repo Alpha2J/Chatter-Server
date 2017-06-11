@@ -3,6 +3,8 @@ package cn.sourcecodes.chatterServer.service;
 import cn.sourcecodes.chatterServer.entity.Chatter;
 import cn.sourcecodes.chatterServer.entity.ChatterPrivateInfo;
 
+import java.util.List;
+
 /**
  * Created by cn.sourcecodes on 2017/5/11.
  */
@@ -38,6 +40,13 @@ public interface ChatterService {
      * @return
      */
     Chatter findChatterById(int id);
+
+    /**
+     * 不定条件的搜索(只根据account或phone来搜)
+     * @param chatterStr
+     * @return
+     */
+    List<Chatter> wideFindChatter(String chatterStr);
 
     /**
      * 查看账号是否已经被注册

@@ -82,6 +82,19 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    public List<Message> getUnReadMessages(int chatterId, int lastAccessMessageId) {
+        List<Message> messageList = null;
+
+        try {
+            messageList = messageDao.getMessageByReceiveId(chatterId, lastAccessMessageId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return messageList;
+    }
+
+    @Override
     public List<Message> getUnReadGroupMessage(int chatterId) {
         List<Message> messageList = null;
 

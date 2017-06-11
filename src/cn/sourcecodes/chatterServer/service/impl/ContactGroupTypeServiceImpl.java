@@ -16,6 +16,25 @@ import java.util.List;
  * Created by cn.sourcecodes on 2017/5/20.
  */
 public class ContactGroupTypeServiceImpl implements ContactGroupTypeService {
+
+    private static ContactGroupTypeServiceImpl instance;
+
+    private ContactGroupTypeServiceImpl() {}
+
+    public static ContactGroupTypeServiceImpl getInstance() {
+        if(instance == null) {
+            synchronized (ContactGroupTypeServiceImpl.class) {
+                if(instance == null) {
+                    instance = new ContactGroupTypeServiceImpl();
+                    return instance;
+                }
+            }
+        }
+
+        return instance;
+    }
+
+
     private ContactGroupTypeDao contactGroupTypeDao = ContactGroupTypeDaoImpl.getInstance();
     private ChatterDao chatterDao = ChatterDaoImpl.getInstance();
 

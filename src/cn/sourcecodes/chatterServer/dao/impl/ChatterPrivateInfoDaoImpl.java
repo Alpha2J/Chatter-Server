@@ -1,7 +1,6 @@
 package cn.sourcecodes.chatterServer.dao.impl;
 
 import cn.sourcecodes.chatterServer.dao.ChatterPrivateInfoDao;
-import cn.sourcecodes.chatterServer.service.fieldInitializer.FieldInitializerFactory;
 import cn.sourcecodes.chatterServer.entity.ChatterPrivateInfo;
 
 import java.sql.SQLException;
@@ -31,8 +30,6 @@ public class ChatterPrivateInfoDaoImpl extends BaseDaoImpl<ChatterPrivateInfo> i
     @Override
     public long addChatterPrivateInfo(ChatterPrivateInfo chatterPrivateInfo) throws SQLException {
         String sql = "INSERT INTO chatterPrivateInfo(chatterId, password, state) VALUES ( ?, ?, ?)";
-
-        FieldInitializerFactory.getInitializer("ChatterPrivateInfoFieldInitializer").initializeField(chatterPrivateInfo);
 
         return insert(sql,
                 chatterPrivateInfo.getChatterId(), chatterPrivateInfo.getPassword(), chatterPrivateInfo.getState());

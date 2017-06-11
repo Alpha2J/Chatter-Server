@@ -42,6 +42,6 @@ public class ChatterPrivateInfoFieldValidator implements FieldValidator<ChatterP
             return false;
         }
 
-        return false;
+        return true;
     }
 }

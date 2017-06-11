@@ -96,11 +96,7 @@ public class MessageNotifier {
      * 查看是否有新的消息, 如果有, 获取上次访问的最后一个id
      * @return
      */
-    public int checkAndGetLastMessageId() {
-        if(isHasNewMessage()) {
-            return getLastAccessMessageId();
-        } else {
-            return -1;
-        }
+    public boolean checkHasNewMessage() {
+        return isHasNewMessage();
     }
 }

@@ -2,6 +2,7 @@ package cn.sourcecodes.chatterServer.service.fieldInitializer.initializers.impl;
 
 import cn.sourcecodes.chatterServer.service.fieldInitializer.initializers.FieldInitializer;
 import cn.sourcecodes.chatterServer.entity.Message;
+import cn.sourcecodes.chatterServer.util.UUIDGenerator;
 
 import java.util.Date;
 
@@ -48,7 +49,7 @@ public class MessageFieldInitializer implements FieldInitializer<Message> {
 
         String uuid = message.getUuid();
         if(uuid == null) {
-            uuid = "";
+            uuid = UUIDGenerator.generateUUID();
             message.setUuid(uuid);
         }
 

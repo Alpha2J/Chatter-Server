@@ -26,6 +26,14 @@ public interface MessageService {
     List<Message> getUnReadMessages(int chatterId);
 
     /**
+     * 用上次最后读取的id获取某个人的未读消息, 包括群聊和私聊消息
+     * @param chatterId
+     * @param lastAccessMessageId
+     * @return
+     */
+    List<Message> getUnReadMessages(int chatterId, int lastAccessMessageId);
+
+    /**
      * 获取未读的群聊消息
      * @param chatterId
      * @return

@@ -37,7 +37,7 @@ public class ValidationServlet extends javax.servlet.http.HttpServlet {
             return;
         }
 
-        ///检测参数值是否合法, login, register, logOut 三者之一为合法
+        //检测参数值是否合法, login, register, logOut 三者之一为合法
         Method method;
         try {
             method = ValidationServlet.class.getDeclaredMethod(methodName, HttpServletRequest.class, HttpServletResponse.class);
@@ -79,6 +79,7 @@ public class ValidationServlet extends javax.servlet.http.HttpServlet {
         }
 
         Chatter chatter = chatterService.loginByAccount(account, password);
+
         if(chatter != null) {//chatter不为null说明验证通过
             //一个用户只能在一个地方登录
             if(((Map<java.lang.Integer, MessageNotifier>) getServletContext().getAttribute("chatterNotifierMap")).get(chatter.getId()) != null) {

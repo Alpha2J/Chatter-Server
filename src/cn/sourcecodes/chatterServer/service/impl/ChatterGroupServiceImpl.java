@@ -18,6 +18,24 @@ import java.util.List;
  */
 public class ChatterGroupServiceImpl implements ChatterGroupService {
 
+    private static ChatterGroupServiceImpl instance;
+
+    private ChatterGroupServiceImpl() {}
+
+    public static ChatterGroupServiceImpl getInstance() {
+        if(instance == null) {
+            synchronized (ChatterGroupServiceImpl.class) {
+                if(instance == null) {
+                    instance = new ChatterGroupServiceImpl();
+                    return instance;
+                }
+            }
+        }
+
+        return instance;
+    }
+
+
     private ChatterGroupDao chatterGroupDao = ChatterGroupDaoImpl.getInstance();
     private ChatterGroupMemberDao chatterGroupMemberDao = ChatterGroupMemberDaoImpl.getInstance();
 

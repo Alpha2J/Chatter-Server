@@ -9,8 +9,10 @@
     <title>$Title$</title>
   </head>
   <body>
-  <form action="testUrl" method="post">
-    <input type="submit" value="submit"/>
+  <form action="" method="post" enctype="multipart/form-data">
+    <input type="text" name="username"/>
+    <input type="file" name="hello"/>
+    <input type="submit"/>
   </form>
   </body>
 </html>

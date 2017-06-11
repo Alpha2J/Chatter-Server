@@ -36,6 +36,7 @@ public class BaseDaoImpl<T> implements BaseDao<T> {
         //这里不能用integer的, resultSet.getObject(1) 返回的主键类型为long
         addId = queryRunner.insert(connection, sql, new ScalarHandler<Long>(), params);
 
+        connection.close();
         return addId;
     }
 
@@ -77,6 +78,7 @@ public class BaseDaoImpl<T> implements BaseDao<T> {
             addedIdList.add(((long)objects.get(i)[0]));
         }
 
+        connection.close();
         return addedIdList;
     }
 
@@ -84,21 +86,30 @@ public class BaseDaoImpl<T> implements BaseDao<T> {
     public T query(String sql, Object... params) throws SQLException {
         Connection connection = DatabaseUtils.getConnection();
 
-        return queryRunner.query(connection, sql, new BeanHandler<>(clazz), params);
+        T t = queryRunner.query(connection, sql, new BeanHandler<>(clazz), params);
+
+        connection.close();
+        return t;
     }
 
     @Override
     public List<T> queryForList(String sql, Object... params) throws SQLException {
         Connection connection = DatabaseUtils.getConnection();
 
-        return queryRunner.query(connection, sql, new BeanListHandler<>(clazz), params);
+        List<T> tList = queryRunner.query(connection, sql, new BeanListHandler<>(clazz), params);
+
+        connection.close();
+        return tList;
     }
 
     @Override
     public int update(String sql, Object... params) throws SQLException {
         Connection connection = DatabaseUtils.getConnection();
 
-        return queryRunner.update(connection, sql, params);
+        int row = queryRunner.update(connection, sql, params);
+
+        connection.close();
+        return row;
     }
 
     //这里批量处理设置了事务, 如果sql执行过程中有异常产生, 那么回滚事务
@@ -129,6 +140,7 @@ public class BaseDaoImpl<T> implements BaseDao<T> {
             }
         }
 
+        connection.close();
         return rows;
     }
 }

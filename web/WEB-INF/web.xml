@@ -5,7 +5,17 @@
          version="3.1">
     <display-name>chatter</display-name>
 
-    <!--入口, 注册登录等-->
+    <!--系统初始化-->
+    <servlet>
+        <servlet-name>appInitServlet</servlet-name>
+        <servlet-class>cn.sourcecodes.chatterServer.servlet.appInit.AppInitServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>appInitServlet</servlet-name>
+        <url-pattern>/appInit</url-pattern>
+    </servlet-mapping>
+
+    <!--验证模块-->
     <servlet>
         <servlet-name>validationServlet</servlet-name>
         <servlet-class>cn.sourcecodes.chatterServer.servlet.validation.ValidationServlet</servlet-class>
@@ -15,24 +25,48 @@
         <url-pattern>/validation</url-pattern>
     </servlet-mapping>
 
-
+    <!--好友模块-->
     <servlet>
-        <servlet-name>createChatterGroupServlet</servlet-name>
-        <servlet-class>cn.sourcecodes.chatterServer.servlet.action.CreateChatterGroupServlet</servlet-class>
+        <servlet-name>contactServlet</servlet-name>
+        <servlet-class>cn.sourcecodes.chatterServer.servlet.contact.ContactServlet</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>createChatterGroupServlet</servlet-name>
-        <url-pattern>/action/createChatterGroup</url-pattern>
+        <servlet-name>contactServlet</servlet-name>
+        <url-pattern>/contact</url-pattern>
     </servlet-mapping>
 
+    <!--群组模块-->
     <servlet>
-        <servlet-name>appInitServlet</servlet-name>
-        <servlet-class>cn.sourcecodes.chatterServer.servlet.AppInitServlet</servlet-class>
+        <servlet-name>groupServlet</servlet-name>
+        <servlet-class>cn.sourcecodes.chatterServer.servlet.group.GroupServlet</servlet-class>
     </servlet>
-
     <servlet-mapping>
-        <servlet-name>appInitServlet</servlet-name>
-        <url-pattern>/appInit</url-pattern>
+        <servlet-name>groupServlet</servlet-name>
+        <url-pattern>/group</url-pattern>
+    </servlet-mapping>
+
+
+    <!--消息模块-->
+    <!--接收客户端发来的消息-->
+    <!-- 已经直接在类文件中用注解配置了 -->
+
+    <!--发消息回客户端-->
+    <servlet>
+        <servlet-name>messageSendServlet</servlet-name>
+        <servlet-class>cn.sourcecodes.chatterServer.servlet.message.MessageSendServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>messageSendServlet</servlet-name>
+        <url-pattern>/message/getMessage</url-pattern>
+    </servlet-mapping>
+    <!--检测是否有新消息-->
+    <servlet>
+        <servlet-name>synCheckServlet</servlet-name>
+        <servlet-class>cn.sourcecodes.chatterServer.servlet.message.SynCheckServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>synCheckServlet</servlet-name>
+        <url-pattern>/message/synCheck</url-pattern>
     </servlet-mapping>
 
 
@@ -40,8 +74,8 @@
     <!--过滤器filter写在这-->
     <filter>
         <description>设置response的编码的过滤器</description>
-        <filter-name>encodingAndContentTypeFilter</filter-name>
-        <filter-class>cn.sourcecodes.chatterServer.filter.EncodingAndContentTypeFilter</filter-class>
+        <filter-name>myServletFilter</filter-name>
+        <filter-class>cn.sourcecodes.chatterServer.filter.MyServletFilter</filter-class>
 
         <init-param>
             <description>设置返回的数据的编码</description>
@@ -55,7 +89,7 @@
         </init-param>
     </filter>
     <filter-mapping>
-        <filter-name>encodingAndContentTypeFilter</filter-name>
+        <filter-name>myServletFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 

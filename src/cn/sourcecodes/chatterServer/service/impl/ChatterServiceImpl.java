@@ -2,17 +2,22 @@ package cn.sourcecodes.chatterServer.service.impl;
 
 import cn.sourcecodes.chatterServer.dao.ChatterDao;
 import cn.sourcecodes.chatterServer.dao.ChatterPrivateInfoDao;
+import cn.sourcecodes.chatterServer.dao.MessageNotifierDao;
 import cn.sourcecodes.chatterServer.dao.impl.ChatterDaoImpl;
 import cn.sourcecodes.chatterServer.dao.impl.ChatterPrivateInfoDaoImpl;
+import cn.sourcecodes.chatterServer.dao.impl.MessageNotifierDaoImpl;
 import cn.sourcecodes.chatterServer.entity.Chatter;
 import cn.sourcecodes.chatterServer.entity.ChatterPrivateInfo;
 import cn.sourcecodes.chatterServer.service.ChatterService;
 import cn.sourcecodes.chatterServer.service.fieldInitializer.FieldInitializerFactory;
 import cn.sourcecodes.chatterServer.service.fieldValidator.FieldValidatorFactory;
+import cn.sourcecodes.chatterServer.servlet.message.entity.MessageNotifier;
 import cn.sourcecodes.chatterServer.servlet.validation.constant.ValidationConstant;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -41,6 +46,7 @@ public class ChatterServiceImpl implements ChatterService {
 
     private ChatterDao chatterDao = ChatterDaoImpl.getInstance();
     private ChatterPrivateInfoDao chatterPrivateInfoDao = ChatterPrivateInfoDaoImpl.getInstance();
+    private MessageNotifierDao messageNotifierDao = MessageNotifierDaoImpl.getInstance();
 
     /**
      * 注册的时候只需要输入基本信息, 只检测密码是否为空
@@ -85,6 +91,12 @@ public class ChatterServiceImpl implements ChatterService {
             long addedId = chatterDao.addChatter(chatter);
             chatterPrivateInfo.setChatterId((int)addedId);
             chatterPrivateInfoDao.addChatterPrivateInfo(chatterPrivateInfo);
+
+            //注册成功后要往消息同步表写入一条记录, 否则以后消息无法同步
+            MessageNotifier messageNotifier = new MessageNotifier();
+            messageNotifier.setChatterId((int) addedId);
+
+            messageNotifierDao.addMessageNotifier(messageNotifier);
             isSuccess = true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -103,7 +115,7 @@ public class ChatterServiceImpl implements ChatterService {
             }
 
             int chatterId = chatter.getId();
-            ChatterPrivateInfo chatterPrivateInfo = chatterPrivateInfoDao.getChatterPrivateInfoById(chatterId);
+            ChatterPrivateInfo chatterPrivateInfo = chatterPrivateInfoDao.getChatterPrivateInfoByChatterId(chatterId);
             if(chatterPrivateInfo == null) {
                 return null;
             }
@@ -163,6 +175,35 @@ public class ChatterServiceImpl implements ChatterService {
         }
 
         return chatter;
+    }
+
+    //只根据账号和手机号来搜
+    @Override
+    public List<Chatter> wideFindChatter(String chatterStr) {
+        //为空或长度太长, 返回空
+        if(chatterStr == null || chatterStr.length() > 255) {
+            return null;
+        }
+
+        List<Chatter> chatterList = null;
+
+        try {
+            Chatter chatter = chatterDao.getChatterByAccount(chatterStr);
+            Chatter chatter1 = chatterDao.getChatterByPhone(chatterStr);
+            if(chatter != null || chatter1 != null) {
+                chatterList = new ArrayList<>();
+                if(chatter != null) {
+                    chatterList.add(chatter);
+                }
+                if(chatter1 != null) {
+                    chatterList.add(chatter1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return chatterList;
     }
 
     @Override

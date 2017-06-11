@@ -10,7 +10,7 @@
 </head>
 <body>
 <form action="validation" method="post">
-    <input type="hidden" name="method" value="aa"/>
+    <input type="hidden" name="method" value="register"/>
     account:<input type="text" name="account"/>
     password:<input type="password" name="password"/>
     <input type="submit" value="登录"/>

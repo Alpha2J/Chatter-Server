@@ -39,12 +39,19 @@ public class MessageConstant {
     public static final int MESSAGE__NEW_TRUE = 10003;//表示有新的消息
     public static final int MESSAGE__NEW_FALSE = 10004;//表示没有新的消息
     public static final int MESSAGE__PARAMETER_RESOLVE_ERROR = 10005;//表示参数解析出错
+    public static final int MESSAGE__GET_SUCCESS_NOT_NULL = 10006;//获取消息成功, 且有新消息
+    public static final int MESSAGE__GET_SUCCESS_NULL = 10007;//获取消息成功, 没有新消息
 
     //内容改变通知消息
     public static final int MESSAGE__GROUP_INFO_CHANGE = 80000;//表示群资料更改, 比如群公告
 
     //系统消息
     public static final int MESSAGE__CONTENT_TYPE_SYSTEM = 90000;//表示内容来自系统, 而不是某个用户
+
+
+    //好友模块的消息
+    public static final int MESSAGE__CONTACT_ADD_VALIDATION = 90001; //表示有人想添加我为好友
+    public static final int MESSAGE__CONTACT_ADD_RESPONSE = 90002;//表示回应别人的添加请求的消息
 
     //消息模块程序代码验证常量
     public static final int MESSAGE__ADD_MESSAGE_FAIL_UNKNOWN_REASON = 2001;//添加消息失败, 未知原因
