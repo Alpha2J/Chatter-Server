@@ -1,3 +1,7 @@
+看了下, 应该是个烂尾项目.
+
+
+
 # Chatter-Server
 基于Servlet的一个IM服务端. [控制台客户端地址](https://github.com/Alpha2J/Chatter-Client)
 
